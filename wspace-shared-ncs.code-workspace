@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../../sdk/ncs"
+		}
+	],
+	"settings": {
+		"C_Cpp.default.includePath": [
+			"${workspaceFolder}/fw/src/**",
+			"${workspaceFolder}/fw/build/zephyr/include/**",
+			"${workspaceFolder}/../../../sdk/ncs**"
+		],
+		"C_Cpp.default.defines": [],
+		"C_Cpp.default.cStandard": "c11",
+		"C_Cpp.default.cppStandard": "c++17",
+		"C_Cpp.default.intelliSenseMode": "gcc-arm",
+	}
+}

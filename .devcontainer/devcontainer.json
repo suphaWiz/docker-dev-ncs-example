@@ -1,0 +1,70 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.154.2/containers/docker-existing-dockerfile
+{
+	"name": "dev-docker",
+	// "initializeCommand": "--rc-file script/.env_vars.sh",
+	"dockerFile": "../Dockerfile",
+	// Sets the run context to one level up instead of the .devcontainer folder.
+	"context": "..",
+	"workspaceFolder": "/proj",
+	"workspaceMount": "source=${localWorkspaceFolder},target=/proj,type=bind",
+	"mounts": [
+		"source=/dev/bus/usb,target=/dev/bus/usb,type=bind",
+		// "source=/home/cylance/devel/sdk/ncs,target=/proj/ncs,type=bind"
+	],
+	"remoteEnv": {
+		"TOOLCHAIN_PATH": "${containerEnv:GNUARMEMB_TOOLCHAIN_PATH}"
+	},
+	// Set *default* container specific settings.json values on container create.
+	"settings": {
+		"terminal.integrated.shell.linux": "/bin/bash",
+		"terminal.integrated.inheritEnv": true,
+		"terminal.integrated.copyOnSelection": true,
+		"terminal.integrated.shellArgs.linux": [
+			"--rcfile",
+			"script/.env_vars.sh"
+		],
+		"C_Cpp.default.includePath": [
+			"${workspaceFolder}/src/**",
+			"${workspaceFolder}/build/zephyr/include/**",
+			"${workspaceFolder}/ncs/**"
+		],
+		"C_Cpp.intelliSenseEngine": "Default",
+		"C_Cpp.autocomplete": "Default",
+		"C_Cpp.errorSquiggles": "EnabledIfIncludesResolve",
+		"C_Cpp.formatting": "Disabled",
+		"C_Cpp.default.defines": [],
+		"C_Cpp.default.compilerPath": "${TOOLCHAIN_PATH}/bin/arm-none-eabi-gcc",
+		"C_Cpp.default.cStandard": "c11",
+		"C_Cpp.default.cppStandard": "c++17",
+		"C_Cpp.default.intelliSenseMode": "gcc-arm",
+	},
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"ms-vscode.cpptools",
+		"marus25.cortex-debug",
+		"donjayamanne.git-extension-pack",
+	],
+	"build": {
+		"args": {
+			"UID": "1001",
+			"GID": "1001",
+			"NCS_IN_DOCKER": "true"
+		}
+	},
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+	// Uncomment the next line to run commands after the container is created - for example installing curl.
+	// "postCreateCommand": "apt-get update && apt-get install -y curl",
+	// Uncomment when using a ptrace-based debugger like C++, Go, and Rust
+	"runArgs": [
+		"--cap-add=SYS_PTRACE",
+		"--security-opt",
+		"seccomp=unconfined",
+		"--privileged"
+	],
+	// Uncomment to use the Docker CLI from inside the container. See https://aka.ms/vscode-remote/samples/docker-from-docker.
+	// "mounts": [ "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" ],
+	// Uncomment to connect as a non-root user if you've added one. See https://aka.ms/vscode-remote/containers/non-root.
+	// "remoteUser": "user"
+}
