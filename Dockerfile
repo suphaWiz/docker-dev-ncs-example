@@ -68,16 +68,19 @@ RUN apt -y update && \
     gcc-multilib \
     make \
     ninja-build \
-    # python3-dev \
-    python3-pip \
-    # python3-ply \
-    # python3-setuptools \
-    # python-xdg \
     locales \
     git \
     sudo \
     libncurses5 \
-    screen
+    screen \
+    python3-pip \
+    dos2unix
+    # libfreetype6:amd64 \
+    # python3-dev \
+    # python3-ply \
+    # python3-setuptools \
+    # python-xdg \
+  
 # apt install -y ./renode_${RENODE_VERSION}_amd64.deb && \
 # rm renode_${RENODE_VERSION}_amd64.deb && \
 # rm -rf /var/lib/apt/lists/*
@@ -101,21 +104,17 @@ ENV GNUARMEMB_TOOLCHAIN_PATH=/opt/toolchains/${GCC_ARM_NAME}
 ENV DISPLAY=:0
 
 RUN mkdir -p ${NCS_PATH}
-ADD script script
-RUN if [ ${NCS_IN_DOCKER} = true ]; then ./script/ncs-init.sh ${NCS_PATH}; fi
-RUN set +o noclobber
-# ADD ./entrypoint.sh /home/user/entrypoint.sh
-# RUN dos2unix /home/user/entrypoint.sh
+ADD script/* /home/user/
+WORKDIR /home/user
+RUN chmod +x ncs-init.sh .env_vars.sh entrypoint.sh && dos2unix ncs-init.sh .env_vars.sh entrypoint.sh
+RUN if [ ${NCS_IN_DOCKER} = true ]; then ./ncs-init.sh ${NCS_PATH}; fi
 
-EXPOSE 2331
-
-# ENTRYPOINT ["/home/user/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash"]
 # USER user
 
 WORKDIR /proj
 VOLUME ["/proj/ncs"];
 VOLUME ["/proj"]
-CMD ["/bin/bash"]
 
 # ARG VNCPASSWD=zephyr
 # RUN mkdir ~/.vnc && x11vnc -storepasswd ${VNCPASSWD} ~/.vnc/passwd
