@@ -23,6 +23,36 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
+# Download dependencies using wget
+RUN wget -q --show-progress --progress=bar:force:noscroll --no-check-certificate https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-12-1/nRFCommandLineTools10121Linuxamd64tar.gz && \
+    wget -q --show-progress --progress=bar:force:noscroll --no-check-certificate https://developer.arm.com/-/media/Files/downloads/gnu-rm/10-2020q4/${GCC_ARM_NAME}-x86_64-linux.tar.bz2  && \
+    wget -q --show-progress --progress=bar:force:noscroll --no-check-certificate https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.sh && \
+    wget -q --show-progress --progress=bar:force:noscroll --no-check-certificate --post-data 'accept_license_agreement=accepted&non_emb_ctr=confirmed&submit=Download+software' https://www.segger.com/downloads/jlink/JLink_Linux_x86_64.tgz
+# wget -q --show-progress --progress=bar:force:noscroll --no-check-certificate https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/zephyr-sdk-${ZSDK_VERSION}-setup.run && \
+# wget -q --show-progress --progress=bar:force:noscroll --no-check-certificate https://github.com/renode/renode/releases/download/v${RENODE_VERSION}/renode_${RENODE_VERSION}_amd64.deb && \
+
+# Extract archives
+RUN chmod +x cmake-${CMAKE_VERSION}-Linux-x86_64.sh && \
+    ./cmake-${CMAKE_VERSION}-Linux-x86_64.sh --skip-license --prefix=/usr/local && \
+    rm -f ./cmake-${CMAKE_VERSION}-Linux-x86_64.sh
+
+RUN mkdir -p /opt/tools/temp
+RUN tar -xf nRFCommandLineTools10121Linuxamd64tar.gz -C /opt/tools/temp && \
+    tar -xf opt/tools/temp/nRF-Command-Line-Tools_10_12_1.tar -C /opt/tools/ && \
+    rm -f nRF-Command-Line-Tools_10_12_1_Linux-amd64.tar.gz && \
+    rm -rf /opt/tools/temp
+
+RUN mkdir -p /opt/SEGGER/JLink
+RUN tar -xf JLink_Linux_x86_64.tgz --strip-components=1 -C /opt/SEGGER/JLink/ && \
+    rm -f JLink_Linux_x86_64.tgz
+
+RUN mkdir -p /opt/toolchains
+RUN tar -xf ${GCC_ARM_NAME}-x86_64-linux.tar.bz2 -C /opt/toolchains/ && \
+    rm -f ${GCC_ARM_NAME}-x86_64-linux.tar.bz2
+
+# RUN sh "zephyr-sdk-${ZSDK_VERSION}-setup.run" --quiet -- -d /opt/toolchains/zephyr-sdk-${ZSDK_VERSION} && \
+#     rm "zephyr-sdk-${ZSDK_VERSION}-setup.run"
+
 # Download dependencies using apt
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt -y update && \
@@ -60,36 +90,6 @@ RUN pip3 install wheel &&\
     pip3 install west && \
     pip3 install sh
 
-# Download dependencies using wget
-RUN wget -q --show-progress --progress=bar:force:noscroll --no-check-certificate https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-12-1/nRFCommandLineTools10121Linuxamd64tar.gz && \
-    wget -q --show-progress --progress=bar:force:noscroll --no-check-certificate https://developer.arm.com/-/media/Files/downloads/gnu-rm/10-2020q4/${GCC_ARM_NAME}-x86_64-linux.tar.bz2  && \
-    wget -q --show-progress --progress=bar:force:noscroll --no-check-certificate https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.sh && \
-    wget -q --show-progress --progress=bar:force:noscroll --no-check-certificate --post-data 'accept_license_agreement=accepted&non_emb_ctr=confirmed&submit=Download+software' https://www.segger.com/downloads/jlink/JLink_Linux_x86_64.tgz
-# wget -q --show-progress --progress=bar:force:noscroll --no-check-certificate https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/zephyr-sdk-${ZSDK_VERSION}-setup.run && \
-# wget -q --show-progress --progress=bar:force:noscroll --no-check-certificate https://github.com/renode/renode/releases/download/v${RENODE_VERSION}/renode_${RENODE_VERSION}_amd64.deb && \
-
-# Extract archives
-RUN chmod +x cmake-${CMAKE_VERSION}-Linux-x86_64.sh && \
-    ./cmake-${CMAKE_VERSION}-Linux-x86_64.sh --skip-license --prefix=/usr/local && \
-    rm -f ./cmake-${CMAKE_VERSION}-Linux-x86_64.sh
-
-RUN mkdir -p /opt/tools/temp
-RUN tar -xf nRFCommandLineTools10121Linuxamd64tar.gz -C /opt/tools/temp && \
-    tar -xf opt/tools/temp/nRF-Command-Line-Tools_10_12_1.tar -C /opt/tools/ && \
-    rm -f nRF-Command-Line-Tools_10_12_1_Linux-amd64.tar.gz && \
-    rm -rf /opt/tools/temp
-
-RUN mkdir -p /opt/SEGGER/JLink
-RUN tar -xf JLink_Linux_x86_64.tgz --strip-components=1 -C /opt/SEGGER/JLink/ && \
-    rm -f JLink_Linux_x86_64.tgz
-
-RUN mkdir -p /opt/toolchains
-RUN tar -xf ${GCC_ARM_NAME}-x86_64-linux.tar.bz2 -C /opt/toolchains/ && \
-    rm -f ${GCC_ARM_NAME}-x86_64-linux.tar.bz2
-
-# RUN sh "zephyr-sdk-${ZSDK_VERSION}-setup.run" --quiet -- -d /opt/toolchains/zephyr-sdk-${ZSDK_VERSION} && \
-#     rm "zephyr-sdk-${ZSDK_VERSION}-setup.run"
-
 # Set the locale
 ENV PATH=/opt/SEGGER/JLink:/opt/tools/nrfjprog:/opt/tools/mergehex:${PATH}
 ENV NCS_PATH=/proj/ncs
@@ -107,7 +107,7 @@ RUN set +o noclobber
 # ADD ./entrypoint.sh /home/user/entrypoint.sh
 # RUN dos2unix /home/user/entrypoint.sh
 
-# EXPOSE 22
+EXPOSE 2331
 
 # ENTRYPOINT ["/home/user/entrypoint.sh"]
 # USER user

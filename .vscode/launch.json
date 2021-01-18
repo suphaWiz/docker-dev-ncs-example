@@ -60,12 +60,12 @@
             "request": "attach",
             "program": "${workspaceFolder}/build/zephyr/zephyr.elf",
             "preLaunchTask": "build",
-            "processId": "${command:pickProcess}",
+            "miDebuggerServerAddress": "host.docker.internal:2331",
             "MIMode": "gdb",
             "miDebuggerPath": "${env:TOOLCHAIN_PATH}/bin/arm-none-eabi-gdb",
             "setupCommands": [
                 {
-                    "text": "-target-select remote localhost:2331",
+                    "text": "-target-select remote host.docker.internal:2331",
                     "description": "connect to target",
                     "ignoreFailures": false
                 },
