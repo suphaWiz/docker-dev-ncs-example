@@ -2,15 +2,21 @@
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.154.2/containers/docker-existing-dockerfile
 {
 	"name": "dev-docker",
-	// "initializeCommand": "--rc-file script/.env_vars.sh",
+	// "initializeCommand": [
+	// 	"/bin/bash",
+	// 	"-c",
+	// 	"chmod +x script/.env_vars &&",
+	// 	"source",
+	// 	"script/.env_vars"
+	// ],
 	"dockerFile": "../Dockerfile",
 	// Sets the run context to one level up instead of the .devcontainer folder.
 	"context": "..",
-	"workspaceFolder": "/proj",
-	"workspaceMount": "source=${localWorkspaceFolder},target=/proj,type=bind",
+	"workspaceFolder": "${env:PROJ_PATH}",
+	"workspaceMount": "source=${localWorkspaceFolder},target=${env:PROJ_PATH},type=bind",
 	"mounts": [
-		"source=/dev/bus/usb,target=/dev/bus/usb,type=bind",
-		// "source=/home/cylance/devel/sdk/ncs,target=/proj/ncs,type=bind"
+		// "source=/dev/bus/usb,target=/dev/bus/usb,type=bind",
+		"source=${env:NCS_INSTALL_PATH},target=${env:PROJ_PATH}/ncs,type=bind"
 	],
 	"remoteEnv": {
 		"TOOLCHAIN_PATH": "${containerEnv:GNUARMEMB_TOOLCHAIN_PATH}"
@@ -21,8 +27,8 @@
 		"terminal.integrated.inheritEnv": true,
 		"terminal.integrated.copyOnSelection": true,
 		"terminal.integrated.shellArgs.linux": [
-			"--rcfile",
-			"script/.env_vars.sh"
+			"--init-file",
+			"script/bash-init.sh"
 		],
 		"C_Cpp.default.includePath": [
 			"${workspaceFolder}/src/**",
@@ -44,12 +50,13 @@
 		"ms-vscode.cpptools",
 		"marus25.cortex-debug",
 		"donjayamanne.git-extension-pack",
+		"mhutchie.git-graph"
 	],
 	"build": {
 		"args": {
 			"UID": "1001",
 			"GID": "1001",
-			"NCS_IN_DOCKER": "true"
+			// "PROJ_PATH": "${env:PROJ_PATH}"
 		}
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
@@ -61,10 +68,24 @@
 		"--cap-add=SYS_PTRACE",
 		"--security-opt",
 		"seccomp=unconfined",
-		"--privileged",
 		"--add-host=host.docker.internal:172.17.0.1",
+		// "--privileged",
+		// "--device=/dev/bus/usb"
 	],
-	"appPort": 2331,
+	"postCreateCommand": [
+		"/bin/bash",
+		"-c",
+		"/home/user/pre-start.sh"
+	],
+	"postStartCommand": [
+		"/bin/bash",
+		"-c",
+		"script/post-start.sh -f"
+	],
+	"appPort": [
+		2331,
+		5900
+	],
 	// Uncomment to use the Docker CLI from inside the container. See https://aka.ms/vscode-remote/samples/docker-from-docker.
 	// "mounts": [ "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" ],
 	// Uncomment to connect as a non-root user if you've added one. See https://aka.ms/vscode-remote/containers/non-root.
