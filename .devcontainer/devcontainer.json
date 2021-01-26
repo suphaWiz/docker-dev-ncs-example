@@ -54,9 +54,9 @@
 	],
 	"build": {
 		"args": {
-			"UID": "1001",
-			"GID": "1001",
-			// "PROJ_PATH": "${env:PROJ_PATH}"
+			"UID": "${env:USER_ID}",
+			"GID": "${env:GROUP_ID}",
+			"PROJ_PATH": "${env:PROJ_PATH}",
 		}
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
@@ -75,7 +75,7 @@
 	"postCreateCommand": [
 		"/bin/bash",
 		"-c",
-		"/home/user/pre-start.sh"
+		"script/pre-start.sh"
 	],
 	"postStartCommand": [
 		"/bin/bash",
@@ -83,7 +83,6 @@
 		"script/post-start.sh -f"
 	],
 	"appPort": [
-		2331,
 		5900
 	],
 	// Uncomment to use the Docker CLI from inside the container. See https://aka.ms/vscode-remote/samples/docker-from-docker.

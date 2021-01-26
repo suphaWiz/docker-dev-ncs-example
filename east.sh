@@ -19,10 +19,11 @@ key="$1"
 
 case $key in
     --init)
-
-    docker build --build-arg UID=1001 --build-arg GID=1001 -t $DOCKER_NAME .
-    # --build-arg UID=$(id -u) --build-arg GID=$(id -g)
-    
+    docker build \
+        --build-arg UID=$USER_ID \
+        --build-arg GID=$GROUP_ID \
+        --build-arg PROJ_PATH=$PROJ_PATH \
+        -t $DOCKER_NAME .
     exit;;
 
     -r|--run)
