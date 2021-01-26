@@ -9,8 +9,12 @@ BUILD=false
 CLEAN=false
 CROSS=true
 IN_SUB_DIR=false
-source $CURRENT_PATH/script/.env_vars
-source ~/.bashrc
+
+# Check for one of the required env variables
+if [ "$PROJ_PATH" == '' ]; then
+    echo "env variables not set, remember to run 'source script/.env_vars' first!"
+    exit
+fi
 
 POSITIONAL=()
 while [[ $# -gt 0 ]]
@@ -44,7 +48,7 @@ case $key in
 
     -b|--build)
     cd $CURRENT_PATH
-    west build -b $DEFAULT_BOARD -d $BUILD_DIR
+    west build -b $BOARD -d $BUILD_DIR
     exit;;
 
     -c|--clean)
