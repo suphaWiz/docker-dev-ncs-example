@@ -23,6 +23,8 @@
 	},
 	// Set *default* container specific settings.json values on container create.
 	"settings": {
+		"search.useIgnoreFiles": false,
+		"kconfig.root": "${env:PROJ_PATH}/Kconfig",
 		"terminal.integrated.shell.linux": "/bin/bash",
 		"terminal.integrated.inheritEnv": true,
 		"terminal.integrated.copyOnSelection": true,
@@ -32,7 +34,7 @@
 		],
 		"C_Cpp.default.includePath": [
 			"${workspaceFolder}/src/**",
-			"${workspaceFolder}/build/zephyr/include/**",
+			"${workspaceFolder}/build/zephyr/include/generated/**",
 			"${workspaceFolder}/ncs/**"
 		],
 		"C_Cpp.intelliSenseEngine": "Default",
@@ -44,13 +46,18 @@
 		"C_Cpp.default.cStandard": "c11",
 		"C_Cpp.default.cppStandard": "c++17",
 		"C_Cpp.default.intelliSenseMode": "gcc-arm",
+		"C_Cpp.default.forcedInclude": [
+			"${workspaceFolder}/build/zephyr/include/generated/autoconf.h"
+		],
 	},
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
 		"ms-vscode.cpptools",
 		"marus25.cortex-debug",
 		"donjayamanne.git-extension-pack",
-		"mhutchie.git-graph"
+		"mhutchie.git-graph",
+		"trond-snekvik.kconfig-lang",
+		"twxs.cmake",
 	],
 	"build": {
 		"args": {
