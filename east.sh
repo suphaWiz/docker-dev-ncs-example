@@ -46,6 +46,10 @@ case $key in
         /bin/bash -c "$PROJ_PATH/script/post-start.sh -e"
     exit;;
 
+    -m|--menu)
+    west build -t menuconfig
+    exit;;
+
     -b|--build)
     cd $CURRENT_PATH
     west build -b $BOARD -d $BUILD_DIR
@@ -66,7 +70,8 @@ case $key in
     echo "--init: Build docker container"
     echo "-a|--attach: Attach to a running container and spawn a bash shell"
     echo "-r|--run: Run the docker container in the current bash shell"
-    echo "-b|--build: Build the project for the configured board: $DEFAULT_BOARD"
+    echo "-m|--menu: Run menuconfig"
+    echo "-b|--build: Build the project for the configured board: $BOARD"
     echo "-c|--clean: Clean the current build directory"
     echo "-t|--term: Create a terminal session using screen. Exit: (Ctrl+a, d)"
     exit;;
