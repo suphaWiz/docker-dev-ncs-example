@@ -30,6 +30,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt -y update && \
 	apt -y upgrade && \
 	apt install --no-install-recommends -y \
+	apt-transport-https \
 	wget 
 
 # Download and extract archives to temp "dl" directory
@@ -140,8 +141,10 @@ RUN rm -rf dl
 
 # Setup user
 ARG USER_NAME=builder
+ENV USER_NAME=${USER_NAME}
 ARG UID
 ARG GID
+
 # Rename user "vscode" from base image to USER_NAME 
 RUN groupmod -g ${GID} -n ${USER_NAME} vscode \
 	&& usermod -u ${UID} -g ${GID} -G plugdev -md /home/${USER_NAME} -l ${USER_NAME} vscode \
@@ -155,19 +158,24 @@ WORKDIR ${PROJ_PATH}/../
 ADD script/pre-start.sh .
 RUN chmod +x pre-start.sh && dos2unix pre-start.sh
 
-# Set user owneship of parent project dir since .west will be placed here
-RUN chown -R ${USER_NAME}:${USER_NAME} .
+# Set user owneship of project dir and parent project dir since .west will be placed here
+RUN mkdir -p ${PROJ_PATH} \
+	&& mkdir ${NCS_PATH} \
+	&& chown -R ${USER_NAME}:${USER_NAME} . \
+	&& chown -R ${USER_NAME}:${USER_NAME} ${PROJ_PATH}
 
-# Change to user
-USER ${USER_NAME}
-
-EXPOSE 5900
-ENTRYPOINT ["/home/builder/pre-start.sh"]
+ENTRYPOINT ["pre-start.sh"]
 CMD ["/bin/bash"]
 
 WORKDIR ${PROJ_PATH}
 VOLUME ["${PROJ_PATH}"]
 VOLUME ["${NCS_PATH}"];
+
+# Change to user
+USER ${USER_NAME}
+EXPOSE 5900
+
+ENV PROJ_PATH=${PROJ_PATH}
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV DISPLAY=:0

@@ -11,7 +11,7 @@ CROSS=true
 IN_SUB_DIR=false
 
 # Check for one of the required env variables
-if [ "$PROJ_PATH" == '' ]; then
+if [ "$BOARD" == '' ]; then
     echo "env variables not set, remember to run 'source script/.env_vars' first!"
     exit
 fi
@@ -26,24 +26,24 @@ case $key in
     docker build \
         --build-arg UID=$USER_ID \
         --build-arg GID=$GROUP_ID \
-        --build-arg PROJ_PATH=$PROJ_PATH \
+        --build-arg PROJ_PATH=$DOCKER_PROJ_PATH \
         -t $DOCKER_NAME .
     exit;;
 
     -r|--run)
         docker run -ti --rm \
-            -v $CURRENT_PATH:$PROJ_PATH \
-            -v $NCS_INSTALL_PATH:$PROJ_PATH/ncs \
+            -v $CURRENT_PATH:$DOCKER_PROJ_PATH \
+            -v $NCS_INSTALL_DIR:$DOCKER_PROJ_PATH/ncs \
             -p 5900:5900 \
             $DOCKER_NAME \
-            /bin/bash -c "$PROJ_PATH/script/post-start.sh -fe"
+            /bin/bash -c "$DOCKER_PROJ_PATH/script/post-start.sh -fe"
     exit;;
 
     -a|--attach)
     
     docker exec -it \
         $(docker ps -q --filter "ancestor=mcr.microsoft.com/vscode/devcontainers/cpp:ubuntu-20.04") \
-        /bin/bash -c "$PROJ_PATH/script/post-start.sh -e"
+        /bin/bash -c "$DOCKER_PROJ_PATH/script/post-start.sh -e"
     exit;;
 
     -m|--menu)

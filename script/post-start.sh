@@ -1,18 +1,14 @@
 #!/bin/bash
 
 CURRENT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"    # Get path of script
-source $CURRENT_PATH/.env_vars
+source $CURRENT_PATH/.env_vars.sh
 
 CMD=$1
 
-# echo "Checking for NCS in $NCS_INSTALL_PATH"
-
 # Check for and init west if neccessary
-if  [ "$NCS_INSTALL_PATH" == '' ]; then
-    echo "Empty NCS path, exiting..."
-elif [ "$(ls -A $NCS_INSTALL_PATH)" ] && [[ $CMD != *"f"* ]]; then
+if [ "$(ls -A $NCS_INSTALL_DIR)" ] && [[ $CMD != *"f"* ]]; then
     echo "NCS seems to already be in place. Skipping west init"
-    # cd $NCS_INSTALL_PATH/nrf
+    # cd $NCS_INSTALL_DIR/nrf
     # git checkout $NCS_VERSION
     # cd /
     # west update

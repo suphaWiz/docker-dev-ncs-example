@@ -55,33 +55,32 @@ Alternatively, the container can also be built using VSCode and the installed "R
 Linux:
 
 ``` bash
-source script/.env_vars
+source script/.env_vars.sh
 code .
 ```
 
 Windows:
 
-``` bash
-TODO
+``` ps1
+. .\script\.env_vars.ps1
 code .
 ```
 
 Firstly, this will source the environment variables set in the .env_vars file into the current terminal. Secondly, the VSCode editor will be started from within that environment, thereby adopting all of the variables. These are used within various config files by the editor, and it is therefore important that the editor is started this way.
 
-After VSCode has started, open the command palette (press F1) and find "Remote Containers: Reopen in Container". This will run the same Dockerfile as the builder script. Additionally, it will also install the VSCode extensions required for intellisense and debug support. When the container has successfully been built, the VSCode editor connects to the VSCode server installed in the docker container. 
+After VSCode has started, open the command palette (press F1) and find "Remote Containers: Reopen in Container". This will build the docker image and can take some time. Additionally, it will also install the VSCode extensions required for intellisense and debug support. When the container has successfully been built, the VSCode editor connects to the VSCode server installed in the docker container.
 
-To build the project, open an integrated terminal and type:
-
-``` bash
-./east.sh -b
-```
 External (host) terminals can also be attached to a running container, simply call (linux):
 
 ``` bash
 ./east.sh -a
 ```
 
-from the workspace directory, and a new bash shell will be executed in the container.
+from the workspace directory, and a new bash shell will be executed in the container. To build the project, open an integrated terminal from VSCode when the docker container is running and type:
+
+``` bash
+./east.sh -b
+```
 
 ### Debugging
 
@@ -97,7 +96,7 @@ JLinkGDBServer -select USB -device nRF9160_xxAA -if SWD -speed auto -noir
 
 Windows:
 
-``` bash
+``` ps1
 JLinkGDBServer.exe -select USB -device nRF9160_xxAA -if SWD -speed auto -noir
 ```
 

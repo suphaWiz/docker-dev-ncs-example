@@ -12,11 +12,11 @@
 	"dockerFile": "../Dockerfile",
 	// Sets the run context to one level up instead of the .devcontainer folder.
 	"context": "..",
-	"workspaceFolder": "${env:PROJ_PATH}",
-	"workspaceMount": "source=${localWorkspaceFolder},target=${env:PROJ_PATH},type=bind",
+	"workspaceFolder": "${env:DOCKER_PROJ_PATH}",
+	"workspaceMount": "source=${localWorkspaceFolder},target=${env:DOCKER_PROJ_PATH},type=bind",
 	"mounts": [
 		// "source=/dev/bus/usb,target=/dev/bus/usb,type=bind",
-		"source=${env:NCS_INSTALL_PATH},target=${env:PROJ_PATH}/ncs,type=bind"
+		"source=${env:NCS_INSTALL_DIR},target=${env:DOCKER_PROJ_PATH}/ncs,type=bind"
 	],
 	"remoteEnv": {
 		"TOOLCHAIN_PATH": "${containerEnv:GNUARMEMB_TOOLCHAIN_PATH}"
@@ -24,7 +24,7 @@
 	// Set *default* container specific settings.json values on container create.
 	"settings": {
 		"search.useIgnoreFiles": false,
-		"kconfig.root": "${env:PROJ_PATH}/Kconfig",
+		"kconfig.root": "${env:DOCKER_PROJ_PATH}/Kconfig",
 		"terminal.integrated.shell.linux": "/bin/bash",
 		"terminal.integrated.inheritEnv": true,
 		"terminal.integrated.copyOnSelection": true,
@@ -63,7 +63,7 @@
 		"args": {
 			"UID": "${env:USER_ID}",
 			"GID": "${env:GROUP_ID}",
-			"PROJ_PATH": "${env:PROJ_PATH}",
+			"PROJ_PATH": "${env:DOCKER_PROJ_PATH}",
 		}
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
