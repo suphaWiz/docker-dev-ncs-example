@@ -12,7 +12,7 @@ IN_SUB_DIR=false
 
 # Check for one of the required env variables
 if [ "$BOARD" == '' ]; then
-    echo "env variables not set, remember to run 'source script/.env_vars' first!"
+    echo "env variables not set, remember to run 'source script/.env_vars.sh' first!"
     exit
 fi
 

@@ -13,7 +13,7 @@ $DIR_PATH = Split-Path $INV.MyCommand.Path
 # The directory will in any case be checked for content and NCS will be downloaded or checked out to the correct
 # version when the docker container is started.
 $NCS_INSTALL_PATH='.'
-$env:DOCKER_PROJ_PATH='/work/proj'
+$env:DOCKER_PROJ_PATH='/home/builder/work'
 $env:USER_ID=1000
 $env:GROUP_ID=1000
 

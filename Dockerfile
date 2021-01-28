@@ -1,23 +1,5 @@
 FROM mcr.microsoft.com/vscode/devcontainers/cpp:ubuntu-20.04
 
-# Tool versions to use
-ENV ZSDK_VERSION=0.11.4
-ENV GCC_ARM_NAME=gcc-arm-none-eabi-10-2020-q4-major
-ENV CMAKE_VERSION=3.18.3
-ENV RENODE_VERSION=1.11.0
-ENV NRF_TOOLS_VERSION=10121
-
-# Build parameters and paths
-ARG TOOLCHAIN_VARIANT=gnuarmemb
-ARG PROJ_PATH=/work/proj
-ENV PATH=/opt/SEGGER/JLink:/opt/tools/nrfjprog:/opt/tools/mergehex:${PATH}
-ENV NCS_PATH=${PROJ_PATH}/ncs
-ENV ZEPHYR_TOOLCHAIN_VARIANT=${TOOLCHAIN_VARIANT}
-ENV ZEPHYR_BASE=$NCS_PATH/zephyr
-ENV GNUARMEMB_TOOLCHAIN_PATH=/opt/toolchains/${GCC_ARM_NAME}
-ENV ZEPHYR_SDK_INSTALL_DIR=/opt/toolchains/zephyr-sdk-${ZSDK_VERSION}
-# ENV PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig
-
 # Set locale
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
@@ -32,6 +14,14 @@ RUN apt -y update && \
 	apt install --no-install-recommends -y \
 	apt-transport-https \
 	wget 
+
+# Tool versions to use
+ENV ZSDK_VERSION=0.11.4
+ENV GCC_ARM_NAME=gcc-arm-none-eabi-10-2020-q4-major
+ENV CMAKE_VERSION=3.18.3
+ENV RENODE_VERSION=1.11.0
+ENV NRF_TOOLS_VERSION=10121
+# ENV PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig
 
 # Download and extract archives to temp "dl" directory
 WORKDIR /dl
@@ -139,9 +129,20 @@ RUN pip3 install wheel \
 WORKDIR /
 RUN rm -rf dl
 
+# Build parameters and paths
+ARG TOOLCHAIN_VARIANT=gnuarmemb
+ARG PROJ_PATH
+
+ENV PROJ_PATH=${PROJ_PATH}
+ENV PATH=/opt/SEGGER/JLink:/opt/tools/nrfjprog:/opt/tools/mergehex:${PATH}
+ENV NCS_PATH=${PROJ_PATH}/ncs
+ENV ZEPHYR_TOOLCHAIN_VARIANT=${TOOLCHAIN_VARIANT}
+ENV ZEPHYR_BASE=$NCS_PATH/zephyr
+ENV GNUARMEMB_TOOLCHAIN_PATH=/opt/toolchains/${GCC_ARM_NAME}
+ENV ZEPHYR_SDK_INSTALL_DIR=/opt/toolchains/zephyr-sdk-${ZSDK_VERSION}
+
 # Setup user
-ARG USER_NAME=builder
-ENV USER_NAME=${USER_NAME}
+ENV USER_NAME=builder
 ARG UID
 ARG GID
 
@@ -153,29 +154,25 @@ RUN groupmod -g ${GID} -n ${USER_NAME} vscode \
 	&& chown -R ${USER_NAME}:${USER_NAME} /home/${USER_NAME} \
 	&& passwd --delete ${USER_NAME}
 
-# Add pre-start script in parent dir
-WORKDIR ${PROJ_PATH}/../
-ADD script/pre-start.sh .
-RUN chmod +x pre-start.sh && dos2unix pre-start.sh
+# Add pre-start script in user dir
+ADD script/pre-start.sh /home
+RUN chmod +x /home/pre-start.sh && dos2unix /home/pre-start.sh
 
-# Set user owneship of project dir and parent project dir since .west will be placed here
+# Set user owneship of user dir and sub dirs
 RUN mkdir -p ${PROJ_PATH} \
 	&& mkdir ${NCS_PATH} \
-	&& chown -R ${USER_NAME}:${USER_NAME} . \
-	&& chown -R ${USER_NAME}:${USER_NAME} ${PROJ_PATH}
+	&& chown -R ${USER_NAME}:${USER_NAME} /home/${USER_NAME}
 
-ENTRYPOINT ["pre-start.sh"]
+ENTRYPOINT ["/home/pre-start.sh"]
 CMD ["/bin/bash"]
 
+# Change to user
+USER ${USER_NAME}
 WORKDIR ${PROJ_PATH}
 VOLUME ["${PROJ_PATH}"]
 VOLUME ["${NCS_PATH}"];
 
-# Change to user
-USER ${USER_NAME}
 EXPOSE 5900
-
-ENV PROJ_PATH=${PROJ_PATH}
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV DISPLAY=:0

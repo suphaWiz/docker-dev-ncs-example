@@ -9,6 +9,6 @@ manifest:
       remote: ncs
       revision: v1.4.2
       import: 
-        path-prefix: proj/ncs
+        path-prefix: work/ncs
   self:
     path: app

@@ -14,7 +14,8 @@ export BOARD=$DEFAULT_BOARD
 # The directory will in any case be checked for content and NCS will be downloaded or checked out to the correct
 # version when the docker container is started.
 NCS_INSTALL_PATH=''
-export DOCKER_PROJ_PATH='/work/proj'
+# Set project directory path (if not ending with "work", also make sure to change path in west.yml:path-prefix)
+export DOCKER_PROJ_PATH='/home/builder/work'
 export USER_ID=$(id -u)
 export GROUP_ID=$(id -g)
 
