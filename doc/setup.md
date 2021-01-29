@@ -91,7 +91,7 @@ For Windows hosts, the JLinkGDBServer must be started on host by starting the GD
 Linux:
 
 ``` bash
-JLinkGDBServer -select USB -device nRF9160_xxAA -if SWD -speed auto -noir
+./east.sh -d
 ```
 
 Windows:

@@ -28,7 +28,7 @@ case $key in
         --build-arg GID=$GROUP_ID \
         --build-arg PROJ_PATH=$DOCKER_PROJ_PATH \
         -t $DOCKER_NAME .
-    exit;;
+    shift;;
 
     -r|--run)
         docker run -ti --rm \
@@ -59,21 +59,26 @@ case $key in
     echo "Cleaning directory \"$BUILD_DIR\""
     cd $CURRENT_PATH
     rm -rf $BUILD_DIR
-    exit;;
+    shift;;
     
     -t|--term)
     screen -fn /dev/ttyACM0 115200
     exit;;
 
+    -d|--debug)
+    JLinkGDBServer -select USB -device nRF9160_xxAA -if SWD -speed auto -noir
+    exit;;
+
     -h|--help|*)
     echo "Options:"
-    echo "--init: Build docker container"
-    echo "-a|--attach: Attach to a running container and spawn a bash shell"
-    echo "-r|--run: Run the docker container in the current bash shell"
-    echo "-m|--menu: Run menuconfig"
-    echo "-b|--build: Build the project for the configured board: $BOARD"
-    echo "-c|--clean: Clean the current build directory"
-    echo "-t|--term: Create a terminal session using screen. Exit: (Ctrl+a, d)"
+    echo "--init: Build docker container (host)"
+    echo "-r|--run: Run the docker container in the current bash shell (host)"
+    echo "-a|--attach: Attach to a running container and spawn a bash shell (host)"
+    echo "-t|--term: Create a terminal session using screen. Exit: (Ctrl+a, d) (host)"
+    echo "-d|--debug: Start GDB server and attach to target (any)"
+    echo "-m|--menu: Run menuconfig (docker)"
+    echo "-b|--build: Build the project for the configured board: $BOARD (docker)"
+    echo "-c|--clean: Clean the current build directory (docker)"
     exit;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later

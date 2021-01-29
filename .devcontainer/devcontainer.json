@@ -58,6 +58,7 @@
 		"mhutchie.git-graph",
 		"trond-snekvik.kconfig-lang",
 		"twxs.cmake",
+		"yzhang.markdown-all-in-one",
 	],
 	"build": {
 		"args": {
