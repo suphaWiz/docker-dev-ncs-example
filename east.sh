@@ -23,6 +23,7 @@ key="$1"
 
 case $key in
     --init)
+    mkdir ncs >/dev/null 2>&1
     docker build \
         --build-arg UID=$USER_ID \
         --build-arg GID=$GROUP_ID \

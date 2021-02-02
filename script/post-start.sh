@@ -6,7 +6,7 @@ source $CURRENT_PATH/.env_vars.sh
 CMD=$1
 
 # Check for and init west if neccessary
-if [ "$(ls -A $NCS_INSTALL_DIR)" ] && [[ $CMD != *"f"* ]]; then
+if [ "$(ls -A $DOCKER_PROJ_PATH/ncs)" ] && [[ $CMD != *"f"* ]]; then
     echo "NCS seems to already be in place. Skipping west init"
     # cd $NCS_INSTALL_DIR/nrf
     # git checkout $NCS_VERSION
