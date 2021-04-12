@@ -13,10 +13,10 @@ RUN apt -y update && \
 	apt -y upgrade && \
 	apt install --no-install-recommends -y \
 	apt-transport-https \
-	wget 
+	wget
 
 # Tool versions to use
-ENV ZSDK_VERSION=0.11.4
+ENV ZSDK_VERSION=0.12.3
 ENV GCC_ARM_NAME=gcc-arm-none-eabi-10-2020-q4-major
 ENV CMAKE_VERSION=3.18.3
 ENV RENODE_VERSION=1.11.0
@@ -27,11 +27,11 @@ ENV NRF_TOOLS_VERSION=10121
 WORKDIR /dl
 
 # Download dependencies using wget
-RUN wget -q --show-progress --progress=bar:force:noscroll --no-check-certificate https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-12-1/nRFCommandLineTools10121Linuxamd64tar.gz \
+RUN wget -q --show-progress --progress=bar:force:noscroll --no-check-certificate https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-12-1/nRFCommandLineTools10121Linuxamd64.tar.gz \
 	&& wget -q --show-progress --progress=bar:force:noscroll --no-check-certificate https://developer.arm.com/-/media/Files/downloads/gnu-rm/10-2020q4/${GCC_ARM_NAME}-x86_64-linux.tar.bz2 \
 	&& wget -q --show-progress --progress=bar:force:noscroll --no-check-certificate https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.sh \
 	&& wget -q --show-progress --progress=bar:force:noscroll --no-check-certificate --post-data 'accept_license_agreement=accepted&non_emb_ctr=confirmed&submit=Download+software' https://www.segger.com/downloads/jlink/JLink_Linux_x86_64.tgz \
-	&& wget -q --show-progress --progress=bar:force:noscroll --no-check-certificate https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/zephyr-sdk-${ZSDK_VERSION}-setup.run \
+	&& wget -q --show-progress --progress=bar:force:noscroll --no-check-certificate https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZSDK_VERSION}/zephyr-sdk-${ZSDK_VERSION}-x86_64-linux-setup.run \
 	&& wget -q --show-progress --progress=bar:force:noscroll --no-check-certificate https://github.com/renode/renode/releases/download/v${RENODE_VERSION}/renode_${RENODE_VERSION}_amd64.deb
 
 # Extract archives
@@ -39,7 +39,7 @@ RUN chmod +x cmake-${CMAKE_VERSION}-Linux-x86_64.sh && \
 	./cmake-${CMAKE_VERSION}-Linux-x86_64.sh --skip-license --prefix=/usr/local
 
 RUN mkdir temp && mkdir -p /opt/tools
-RUN tar -xf nRFCommandLineTools10121Linuxamd64tar.gz -C temp && \
+RUN tar -xf nRFCommandLineTools10121Linuxamd64.tar.gz -C temp && \
 	tar -xf temp/nRF-Command-Line-Tools_10_12_1.tar -C /opt/tools/
 
 RUN mkdir -p /opt/SEGGER/JLink
@@ -48,8 +48,8 @@ RUN tar -xf JLink_Linux_x86_64.tgz --strip-components=1 -C /opt/SEGGER/JLink/
 RUN mkdir -p /opt/toolchains
 RUN tar -xf ${GCC_ARM_NAME}-x86_64-linux.tar.bz2 -C /opt/toolchains/
 
-RUN sh "zephyr-sdk-${ZSDK_VERSION}-setup.run" --quiet -- -d /opt/toolchains/zephyr-sdk-${ZSDK_VERSION} && \
-	rm "zephyr-sdk-${ZSDK_VERSION}-setup.run"
+RUN sh "zephyr-sdk-${ZSDK_VERSION}-x86_64-linux-setup.run" --quiet -- -d /opt/toolchains/zephyr-sdk-${ZSDK_VERSION} && \
+	rm "zephyr-sdk-${ZSDK_VERSION}-x86_64-linux-setup.run"
 
 
 # Download dependencies using apt
@@ -68,6 +68,7 @@ RUN apt install --no-install-recommends -y \
 	dfu-util \
 	file \
 	g++ \
+	g++-multilib \
 	gcc \
 	gcc-multilib \
 	gcovr \
@@ -90,53 +91,39 @@ RUN apt install --no-install-recommends -y \
 	ninja-build \
 	openbox \
 	pkg-config \
-	# doxygen \
-	# python3-dev \
-	# python3-ply \
-	# python3-setuptools \
-	# python-xdg \
 	python3-pip \
 	qemu \
 	socat \
 	sudo \
 	screen \
 	texinfo \
-	# valgrind \
 	x11vnc \
 	xvfb \
 	xz-utils \
 	dos2unix
-# ruby-full \
-# rpm \
-# libarchive-tools \
 
 RUN apt install --no-install-recommends -y \
 	mono-complete \
 	./renode_${RENODE_VERSION}_amd64.deb && \
 	rm -rf /var/lib/apt/lists/*
 
-# RUN gem install \ 
-# 	fpm
-
 
 # Download dependencies using pip
-RUN pip3 install wheel \
-	-r https://raw.githubusercontent.com/zephyrproject-rtos/zephyr/master/scripts/requirements.txt \
-	-r https://raw.githubusercontent.com/zephyrproject-rtos/mcuboot/master/scripts/requirements.txt \
-	-r https://raw.githubusercontent.com/nrfconnect/sdk-nrf/master/scripts/requirements.txt
+RUN pip3 install wheel west
+RUN pip3 install -r https://raw.githubusercontent.com/zephyrproject-rtos/zephyr/master/scripts/requirements.txt 
+RUN pip3 install -r https://raw.githubusercontent.com/zephyrproject-rtos/mcuboot/master/scripts/requirements.txt 
+# RUN pip3 install -r https://raw.githubusercontent.com/nrfconnect/sdk-nrf/master/scripts/requirements.txt
 
 # Remove dowloads
 WORKDIR /
 RUN rm -rf dl
 
 # Build parameters and paths
-ARG TOOLCHAIN_VARIANT=gnuarmemb
 ARG PROJ_PATH
 
 ENV PROJ_PATH=${PROJ_PATH}
 ENV PATH=/opt/SEGGER/JLink:/opt/tools/nrfjprog:/opt/tools/mergehex:${PATH}
 ENV NCS_PATH=${PROJ_PATH}/ncs
-ENV ZEPHYR_TOOLCHAIN_VARIANT=${TOOLCHAIN_VARIANT}
 ENV ZEPHYR_BASE=$NCS_PATH/zephyr
 ENV GNUARMEMB_TOOLCHAIN_PATH=/opt/toolchains/${GCC_ARM_NAME}
 ENV ZEPHYR_SDK_INSTALL_DIR=/opt/toolchains/zephyr-sdk-${ZSDK_VERSION}
@@ -146,7 +133,7 @@ ENV USER_NAME=builder
 ARG UID
 ARG GID
 
-# Rename user "vscode" from base image to USER_NAME 
+# Rename user "vscode" from base image to USER_NAME
 RUN groupmod -g ${GID} -n ${USER_NAME} vscode \
 	&& usermod -u ${UID} -g ${GID} -G plugdev -md /home/${USER_NAME} -l ${USER_NAME} vscode \
 	&& echo "$USER_NAME" 'ALL = (root) NOPASSWD: ALL' > /etc/sudoers.d/${USER_NAME} \
