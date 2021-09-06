@@ -2,113 +2,106 @@
     // Use IntelliSense to learn about possible attributes.
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    // local gdb path: /home/cylance/devel/tools/gcc-arm-none-eabi/gcc-arm-none-eabi-10-2020-q4-major/
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Launch",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/zephyr/zephyr.elf",
-            "preLaunchTask": "build",
-            "args": [],
-            "stopAtEntry": true,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "debugServerPath": "JLinkGDBServer",
-            "debugServerArgs": "-select USB -device nRF9160_xxAA -if SWD -speed auto -noir",
-            "miDebuggerPath": "${env:TOOLCHAIN_PATH}/bin/arm-none-eabi-gdb",
-            "setupCommands": [
-                {
-                    "text": "-target-select remote localhost:2331",
-                    "description": "connect to target",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-file-exec-and-symbols ${workspaceFolder}/build/zephyr/zephyr.elf",
-                    "description": "load file",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor endian little\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor reset\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor halt\"",
-                    "ignoreFailures": false
-                },
-                // {
-                //     "text": "-interpreter-exec console \"monitor arm semihosting enable\"",
-                //     "ignoreFailures": false
-                // },
-                {
-                    "text": "-target-download",
-                    "description": "flash target",
-                    "ignoreFailures": false
-                }
-            ],
-        },
-        {
-            "name": "(gdb) Attach",
-            "type": "cppdbg",
-            "request": "attach",
-            "program": "${workspaceFolder}/build/zephyr/zephyr.elf",
-            "preLaunchTask": "build",
-            "miDebuggerServerAddress": "host.docker.internal:2331",
-            "MIMode": "gdb",
-            "miDebuggerPath": "${env:TOOLCHAIN_PATH}/bin/arm-none-eabi-gdb",
-            "setupCommands": [
-                {
-                    "text": "-target-select remote host.docker.internal:2331",
-                    "description": "connect to target",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-file-exec-and-symbols ${workspaceFolder}/build/zephyr/zephyr.elf",
-                    "description": "load file",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor endian little\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor reset\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor halt\"",
-                    "ignoreFailures": false
-                },
-                // {
-                //     "text": "-interpreter-exec console \"monitor arm semihosting enable\"",
-                //     "ignoreFailures": false
-                // },
-                {
-                    "text": "-target-download",
-                    "description": "flash target",
-                    "ignoreFailures": false
-                }
-            ],
-        },
-        {
-            "name": "Cortex Debug",
+            "name": "app attach",
             "cwd": "${workspaceRoot}",
-            "executable": "build/zephyr/zephyr.elf",
+            "executable": "build/app/zephyr/zephyr.elf",
+            "request": "attach",
+            "interface": "swd",
+            "preLaunchTask": "app",
+            "type": "cortex-debug",
+            "servertype": "external",
+            "armToolchainPath": "${env:TOOLCHAIN_PATH}/bin",
+            "device": "nrf9160_xxAA",
+            "gdbTarget": "host.docker.internal:2331",
+            "preAttachCommands": [
+                "monitor reset",
+                "file ${workspaceFolder}/build/app/zephyr/merged.hex",
+                "load",
+                "symbol-file ${workspaceFolder}/build/app/zephyr/zephyr.elf",
+                "break main.c:1",
+                "monitor reset",
+                "run"
+            ],
+            "preRestartCommands": [
+                "monitor reset",
+                "file ${workspaceFolder}/build/app/zephyr/merged.hex",
+                "load",
+                "symbol-file ${workspaceFolder}/build/app/zephyr/zephyr.elf",
+                "break main.c:1",
+                "monitor reset",
+                "run"
+            ]
+        },
+        {
+            "name": "app launch",
+            "cwd": "${workspaceRoot}",
+            "executable": "build/app/zephyr/zephyr.elf",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "app",
             "type": "cortex-debug",
             "servertype": "jlink",
             "armToolchainPath": "${env:TOOLCHAIN_PATH}/bin",
             "device": "nrf9160_xxAA",
             "serverpath": "JLinkGDBServer",
-            "runToMain": true,
-        }
+            "preLaunchCommands": [
+                "monitor reset",
+                "file ${workspaceFolder}/build/app/zephyr/merged.hex",
+                "load",
+                "symbol-file ${workspaceFolder}/build/app/zephyr/zephyr.elf",
+                "break main.c:1",
+                "monitor reset",
+                "run"
+            ],
+            "preRestartCommands": [
+                "monitor reset",
+                "file ${workspaceFolder}/build/app/zephyr/merged.hex",
+                "load",
+                "symbol-file ${workspaceFolder}/build/app/zephyr/zephyr.elf",
+                "break main.c:1",
+                "monitor reset",
+                "run"
+            ]
+        },
+        {
+            "name": "gtest launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/gtest/zephyr/zephyr.elf",
+            "args": [],
+            "preLaunchTask": "test",
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "qemu launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/qemu/zephyr/zephyr.elf",
+            "args": [],
+            "preLaunchTask": "qemu",
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
     ]
 }

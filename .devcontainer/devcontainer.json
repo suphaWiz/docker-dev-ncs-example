@@ -2,53 +2,114 @@
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.154.2/containers/docker-existing-dockerfile
 {
 	"name": "dev-docker",
-	// "initializeCommand": [
-	// 	"/bin/bash",
-	// 	"-c",
-	// 	"chmod +x script/.env_vars &&",
-	// 	"source",
-	// 	"script/.env_vars"
-	// ],
 	"dockerFile": "../Dockerfile",
 	// Sets the run context to one level up instead of the .devcontainer folder.
 	"context": "..",
-	"workspaceFolder": "${env:DOCKER_PROJ_PATH}",
-	"workspaceMount": "source=${localWorkspaceFolder},target=${env:DOCKER_PROJ_PATH},type=bind",
+	"workspaceFolder": "/home/builder/work",
+	"workspaceMount": "source=${localWorkspaceFolder},target=${containerWorkspaceFolder},type=bind",
 	"mounts": [
 		// "source=/dev/bus/usb,target=/dev/bus/usb,type=bind",
-		"source=${env:NCS_INSTALL_DIR},target=${env:DOCKER_PROJ_PATH}/ncs,type=bind"
+		"source=${env:NCS_INSTALL_DIR},target=${containerWorkspaceFolder}/ncs,type=bind"
 	],
 	"remoteEnv": {
 		"TOOLCHAIN_PATH": "${containerEnv:GNUARMEMB_TOOLCHAIN_PATH}"
 	},
 	// Set *default* container specific settings.json values on container create.
 	"settings": {
-		"search.useIgnoreFiles": false,
-		"kconfig.root": "${env:DOCKER_PROJ_PATH}/Kconfig",
-		"terminal.integrated.shell.linux": "/bin/bash",
-		"terminal.integrated.inheritEnv": true,
-		"terminal.integrated.copyOnSelection": true,
-		"terminal.integrated.shellArgs.linux": [
-			"--init-file",
-			"script/bash-init.sh"
-		],
 		"C_Cpp.default.includePath": [
+			"${workspaceFolder}/build/app/zephyr/include/generated/",
 			"${workspaceFolder}/src/**",
-			"${workspaceFolder}/build/zephyr/include/generated/**",
-			"${workspaceFolder}/ncs/**"
+			"${workspaceFolder}/ext/**",
+			"${workspaceFolder}/include/**",
+			"${workspaceFolder}/ncs/modules/**",
+			"${workspaceFolder}/ncs/nrf/include/**",
+			"${workspaceFolder}/ncs/nrf/subsys/**",
+			"${workspaceFolder}/ncs/nrfxlib/**",
+			"${workspaceFolder}/ncs/zephyr/include/**",
+			"${workspaceFolder}/ncs/zephyr/soc/**",
 		],
 		"C_Cpp.intelliSenseEngine": "Default",
 		"C_Cpp.autocomplete": "Default",
-		"C_Cpp.errorSquiggles": "EnabledIfIncludesResolve",
-		"C_Cpp.formatting": "Disabled",
+		"C_Cpp.errorSquiggles": "Enabled",
+		"C_Cpp.formatting": "vcFormat",
 		"C_Cpp.default.defines": [],
 		"C_Cpp.default.compilerPath": "${TOOLCHAIN_PATH}/bin/arm-none-eabi-gcc",
-		"C_Cpp.default.cStandard": "c11",
-		"C_Cpp.default.cppStandard": "c++17",
+		"C_Cpp.default.cStandard": "gnu99",
+		"C_Cpp.default.cppStandard": "gnu++17",
 		"C_Cpp.default.intelliSenseMode": "gcc-arm",
 		"C_Cpp.default.forcedInclude": [
-			"${workspaceFolder}/build/zephyr/include/generated/autoconf.h"
+			"${workspaceFolder}/build/app/zephyr/include/generated/autoconf.h",
+			"${workspaceFolder}/build/app/zephyr/include/generated/devicetree_unfixed.h"
 		],
+		"search.useIgnoreFiles": false,
+		"kconfig.root": "/home/builder/work/src/Kconfig",
+		"terminal.integrated.profiles.linux": {
+			"bash": {
+				"path": "bash",
+				"args": [
+					"--init-file",
+					"${workspaceFolder}/script/bash-init.sh"
+				]
+			},
+		},
+		"terminal.integrated.copyOnSelection": true,
+		"doxdocgen.c.firstLine": "/*",
+		"doxdocgen.c.lastLine": " */",
+		"doxdocgen.generic.useGitUserEmail": true,
+		"doxdocgen.generic.useGitUserName": true,
+		"doxdocgen.generic.briefTemplate": "@brief ",
+		"doxdocgen.generic.paramTemplate": "@param {param} ",
+		"doxdocgen.generic.boolReturnsTrueFalse": false,
+		"doxdocgen.generic.includeTypeAtReturn": true,
+		"doxdocgen.generic.authorTag": "@author {author} ({email})",
+		"doxdocgen.cpp.tparamTemplate": "@tparam {param} ",
+		"doxdocgen.generic.returnTemplate": "@return {type} ",
+		"doxdocgen.file.fileTemplate": "@file {name}",
+		"doxdocgen.file.copyrightTag": [
+			"@copyright {year} TAG Sensors AS"
+		],
+		"doxdocgen.file.fileOrder": [
+			"file",
+			"author",
+			"brief",
+			"date",
+			"empty",
+			"copyright",
+			"empty",
+			"custom"
+		],
+		// "files.exclude": {
+		// 	"**/nrf/tests/**": true,
+		// 	"**/examples/**": false,
+		// 	"**/samples/**": true,
+		// 	"build/**": true,
+		// 	"**/syscalls/**": true
+		// },
+		// "search.exclude": {
+		// 	"**/nrf/tests/**": true,
+		// 	"**/examples/**": true,
+		// 	"**/samples/**": false,
+		// 	"build/**": false,
+		// 	"**/syscalls/**": true
+		// },
+		"C_Cpp.vcFormat.newLine.beforeOpenBrace.function": "newLine",
+		"C_Cpp.vcFormat.newLine.beforeOpenBrace.block": "newLine",
+		"C_Cpp.vcFormat.newLine.beforeOpenBrace.lambda": "newLine",
+		"C_Cpp.vcFormat.newLine.beforeOpenBrace.namespace": "newLine",
+		"C_Cpp.vcFormat.newLine.beforeOpenBrace.type": "newLine",
+		"C_Cpp.vcFormat.newLine.closeBraceSameLine.emptyFunction": true,
+		"C_Cpp.vcFormat.newLine.closeBraceSameLine.emptyType": true,
+		"C_Cpp.vcFormat.space.pointerReferenceAlignment": "right",
+		"C_Cpp.vcFormat.indent.preprocessor": "oneLeft",
+		"C_Cpp.vcFormat.space.afterComma": true,
+		"devicetree.bindings": [
+			"${zephyrBase}/dts/bindings",
+			"${zephyrBase}/../nrf/dts/bindings",
+			"${workspaceRoot}/dts/bindings",
+		],
+		"kconfig.zephyr.base": "${workspaceRoot}/ncs/zephyr",
+		// "/* kconfig.zephyr.board": {
+		// } */
 	},
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
@@ -59,12 +120,15 @@
 		"trond-snekvik.kconfig-lang",
 		"twxs.cmake",
 		"yzhang.markdown-all-in-one",
+		"cschlosser.doxdocgen",
+		"trond-snekvik.devicetree",
+		"zainchen.json"
 	],
 	"build": {
 		"args": {
-			"UID": "${env:USER_ID}",
-			"GID": "${env:GROUP_ID}",
-			"PROJ_PATH": "${env:DOCKER_PROJ_PATH}",
+			"UID": "1000",
+			"GID": "1000",
+			"PROJ_PATH": "/home/builder/work",
 		}
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
@@ -76,7 +140,7 @@
 		"--cap-add=SYS_PTRACE",
 		"--security-opt",
 		"seccomp=unconfined",
-		"--add-host=host.docker.internal:172.17.0.1",
+		"--add-host=host.docker.internal:172.17.0.1", // NOTE: May need to replace "host-gateway" with 172.17.0.1 in Linux 
 		// "--privileged",
 		// "--device=/dev/bus/usb"
 	],
@@ -90,9 +154,9 @@
 		"-c",
 		"script/post-start.sh -f"
 	],
-	"appPort": [
-		5900
-	],
+	// "appPort": [
+	// 5900
+	// ],
 	// Uncomment to use the Docker CLI from inside the container. See https://aka.ms/vscode-remote/samples/docker-from-docker.
 	// "mounts": [ "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" ],
 	// Uncomment to connect as a non-root user if you've added one. See https://aka.ms/vscode-remote/containers/non-root.
