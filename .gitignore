@@ -54,3 +54,5 @@ build
 CMakeFiles
 .vscode/settings.json
 .vscode/.cortex*
+ext
+ncs
